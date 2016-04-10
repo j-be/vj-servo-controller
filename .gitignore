@@ -1,0 +1,9 @@
+# Python stuff
+*.pyc
+
+# Windows library
+*.dll
+
+# Pycharm
+.idea/
+
