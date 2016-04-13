@@ -4,7 +4,7 @@ import serial
 import threading
 
 # Serial communication with Arduino
-SERIAL_NAME = '/dev/ttyACM0'
+SERIAL_NAME = '/dev/ttyUSB0'
 # Regex for a message
 REGEX_MSG = '^#[0-9]+ [0-9] [0-9]$'
 MSG_TRUE = '1'
