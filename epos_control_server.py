@@ -2,6 +2,7 @@
 
 import logging.config
 import signal
+import threading
 
 from flask import Flask, send_from_directory
 from flask.ext.socketio import SocketIO
@@ -22,6 +23,10 @@ socketio = SocketIO(app)
 epos = None
 # Position fetcher
 position_fetch = None
+# Watch position
+watch_position = True
+# Target position
+target_position = 512
 
 
 @app.route('/')
@@ -36,8 +41,9 @@ def static_js_proxy(path):
 
 @socketio.on('moveTo', namespace='/servo')
 def on_move_to(position):
+	global target_position
 	logging.error("Got move to %s", position)
-	move_to(position)
+	target_position = position
 
 
 def truncate_position(input_position):
@@ -85,11 +91,18 @@ def init_position_fetcher():
 	position_fetch.start()
 
 
+def position_watcher():
+	while watch_position:
+		move_to(target_position)
+	logging.error("Position watcher stopped")
+
+
 def sig_term_handler(signum, frame):
 	raise KeyboardInterrupt('Signal %i receivied!' % signum)
 
 
 def main():
+	global watch_position
 	# Initialize logger
 	logging.config.fileConfig('log.ini')
 
@@ -101,6 +114,8 @@ def main():
 		init_position_fetcher()
 		init_epos()
 
+		watcher_thread = threading.Thread(target=position_watcher)
+		watcher_thread.start()
 
 		# Blocking! - Start Flask server
 		socketio.run(app, host='0.0.0.0')
@@ -109,6 +124,7 @@ def main():
 	finally:
 		if position_fetch:
 			position_fetch.stop()
+		watch_position = False
 
 if __name__ == '__main__':
 	main()
