@@ -13,7 +13,7 @@ from position_fetcher import PositionFetcher
 POSITION_MAX_DELTA_TO_END = 0
 
 EPOS_RELATIVE_POSITION = 20000000
-EPOS_VELOCITY = 3000
+EPOS_VELOCITY = 4840
 
 # Instanciate Flask (Static files and REST API)
 app = Flask(__name__)
