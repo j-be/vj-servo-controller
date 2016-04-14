@@ -93,7 +93,7 @@ def init_epos():
 	global epos
 	# Instanciate EPOS2 control library
 	epos = EposLibWrapper()
-	epos.enableDevice()
+	epos.openDevice()
 
 
 def init_position_fetcher():
