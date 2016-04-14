@@ -1,3 +1,4 @@
+import logging
 import platform
 from ctypes import cdll, c_int, c_uint, byref
 
@@ -13,6 +14,7 @@ EPOS2_MAX_ACCEL = long(pow(2, 32) - 1)
 
 class EposLibWrapper(object):
 	def __init__(self, dev_name="EPOS2", protocol="MAXON SERIAL V2", interface="USB", port="USB0"):
+		self.log = logging.getLogger("eposLib")
 		self.lib = cdll.LoadLibrary(self._getLibraryName())
 		self.dev_name = dev_name
 		self.protocol = protocol
@@ -23,35 +25,36 @@ class EposLibWrapper(object):
 		self.mode = None
 		self.dev_handle = None
 
-	@staticmethod
-	def _getLibraryName():
+	def _getLibraryName(self):
 		current_platform = platform.system()
-		print current_platform
+		self.log.debug("Running on platform: %s", current_platform);
 		for lib, platforms in LIBS.iteritems():
 			if current_platform in platforms:
+				self.log.info("Found lib: %s for platform: %s", lib, current_platform)
 				return lib
+		self.log.error("No library found for platform: %s", current_platform)
 
 	def openDevice(self):
 		err = c_uint()
 		self.dev_handle = self.lib.VCS_OpenDevice(self.dev_name, self.protocol, self.interface, self.port, byref(err));
-		print "Open error:", err.value, "handle:", self.dev_handle
+		self.log.info("Open handle: %s error: %s", self.dev_handle, err.value)
 
 	def closeDevice(self):
 		self.disableDevice()
 		err = c_uint()
 		self.lib.VCS_CloseDevice(self.dev_handle, byref(err))
-		print "Close handle:", self.dev_handle, "error:", err.value
+		self.log.info("Close handle: %s error: %s", self.dev_handle, err.value)
 
 	def enableDevice(self):
 		err = c_uint()
 		self.lib.VCS_SetEnableState(self.dev_handle, self.node_id, byref(err))
-		print "Enabling device handle", self.dev_handle, "node:", self.node_id, "error:", err.value
+		self.log.debug("Enabling node: %s error: %s", self.node_id, err.value)
 		self.enabled = err.value == 0
 
 	def disableDevice(self):
 		err = c_uint()
 		self.lib.VCS_SetDisableState(self.dev_handle, self.node_id, byref(err))
-		print "Disabling device handle", self.dev_handle, "node:", self.node_id, "error:", err.value
+		self.log.info("Disabling node: %s error: %s", self.node_id, err.value)
 		self.enabled = err.value == 0
 
 	def activateProfilePositionMode(self):
@@ -60,7 +63,7 @@ class EposLibWrapper(object):
 			self.enableDevice()
 
 		self.lib.VCS_ActivateProfileVelocityMode(self.dev_handle, self.node_id, byref(err))
-		print "Profile position mode, handle:", self.dev_handle, "node:", self.node_id, "error:", err.value
+		self.log.debug("Activate ProfilePositionMode on node: %s error: %s", self.node_id, err.value)
 		if err.value == 0:
 			self.mode = MODE_PROFILE_POSITION
 
@@ -69,14 +72,15 @@ class EposLibWrapper(object):
 		if not self.mode == MODE_PROFILE_POSITION:
 			self.activateProfilePositionMode()
 		self.lib.VCS_SetPositionProfile(self.dev_handle, self.node_id, velocity, acceleration, acceleration, byref(err))
-		print "Set profile position velocity node:", self.node_id, "to velocity:", velocity, "acceleration:", acceleration, "error:", err.value
+		self.log.debug("Set velocity on node: %s to v=%s a=%s error: %s",
+					  self.node_id, velocity, acceleration, err.value)
 
 	def activatePositionMode(self):
 		err = c_uint()		
 		if not self.enabled:
 			self.enableDevice()
 		self.lib.VCS_ActivateProfilePositionMode(self.dev_handle, self.node_id, byref(err))
-		print "Position mode, handle:", self.dev_handle, "node:", self.node_id, "error:", err.value
+		self.log.debug("Activate PositionMode on node: %s error: %s", self.node_id, err.value)
 		if err.value == 0:
 			self.mode = MODE_POSITION
 
@@ -85,20 +89,21 @@ class EposLibWrapper(object):
 		if self.mode != MODE_POSITION:
 			self.activatePositionMode()
 		self.lib.VCS_MoveToPosition(self.dev_handle, self.node_id, position, 0, 1, byref(err))
-		print "Move node:", self.node_id, "to position:", position, "error:", err.value
+		self.log.debug("Move node: %s to p=%s error: %s", self.node_id, position, err.value)
 
 		if wait_for_target_reached:
-			print "Waiting for target reached"
 			self.waitForTargetReached()
-			print "Target reached"
 
 	def moveToPositionWithVelocity(self, position, velocity, acceleration=EPOS2_MAX_ACCEL, wait_for_target_reached=False):
+		self.log.info("Move to p=%s v=%s a=%s wait=%s", position, velocity, acceleration, wait_for_target_reached)
 		self.setProfilePositionVelocity(velocity, acceleration)
 		self.moveToPosition(position, wait_for_target_reached)
 
 	def waitForTargetReached(self, timeout=-1):
 		err = c_uint()
+		self.log.info("Waiting for target reached on node: %s", self.node_id)
 		self.lib.VCS_WaitForTargetReached(self.dev_handle, self.node_id, timeout, byref(err))
+		self.log.info("Target reached on node: %s", self.node_id)
 
 	def isFaultState(self):
 		err = c_uint()
@@ -110,9 +115,9 @@ class EposLibWrapper(object):
 		err = c_uint()
 		if self.isFaultState():
 			self.lib.VCS_ClearFault(self.dev_handle, self.node_id, byref(err))
-			print "Handle:", self.dev_handle, "node:", self.node_id, "cleared fault state. error:", err.value
+			self.log.info("Cleared fault state on node: %s error: %s", self.node_id, err.value)
 		else:
-			print "Handle:", self.dev_handle, "node:", self.node_id, "is not in fault state!"
+			self.log.debug("Node: %s is not in fault state!", self.node_id)
 
 if __name__ == "__main__":
 	from time import sleep
