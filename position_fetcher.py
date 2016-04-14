@@ -23,7 +23,7 @@ class PositionFetcher(object):
             self.fetcher_thread = threading.Thread(target=self.fetch_data)
 
             # Init Serial port
-            self.serial_port = serial.Serial(SERIAL_NAME, timeout=1)
+            self.serial_port = serial.Serial(SERIAL_NAME, timeout=1, baudrate=115200)
             self.serial_port.flushInput()
             self.serial_port.flushOutput()
             self.serial_lock = threading.Lock()
