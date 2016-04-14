@@ -40,7 +40,8 @@ def on_move_to(position):
 	move_to(position)
 
 
-def move_to(position):
+def move_to(target_position):
+	position = int(target_position)
 	current_position, is_end = position_fetch.get_current_position()
 	if position < current_position and not (is_end and abs(position - current_position) < POSITION_MAX_DELTA_TO_END):
 		move_to_low()
