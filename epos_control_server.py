@@ -11,8 +11,7 @@ from position_fetcher import PositionFetcher
 
 POSITION_MAX_DELTA_TO_END = 0
 
-EPOS_RELATIVE_POSITION_HIGH = 20000000
-EPOS_RELATIVE_POSITION_LOW = -EPOS_RELATIVE_POSITION_HIGH
+EPOS_RELATIVE_POSITION = 20000000
 EPOS_VELOCITY = 3000
 
 # Instanciate Flask (Static files and REST API)
@@ -54,12 +53,12 @@ def move_to(position):
 
 def move_to_low():
 	logging.debug("Moving to lower")
-	epos.moveToPositionWithVelocity(EPOS_RELATIVE_POSITION_LOW, EPOS_VELOCITY)
+	epos.moveToPositionWithVelocity(-EPOS_RELATIVE_POSITION, EPOS_VELOCITY)
 
 
 def move_to_high():
 	logging.debug("Moving to higher")
-	epos.moveToPositionWithVelocity(EPOS_RELATIVE_POSITION_HIGH, EPOS_VELOCITY)
+	epos.moveToPositionWithVelocity(EPOS_RELATIVE_POSITION, EPOS_VELOCITY)
 
 
 def init_epos():
