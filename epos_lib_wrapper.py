@@ -121,6 +121,7 @@ class EposLibWrapper(object):
 		err = c_uint()
 		if self.isFaultState():
 			self.lib.VCS_ClearFault(self.dev_handle, self.node_id, byref(err))
+			self.enableDevice()
 			self.log.info("Cleared fault state on node: %s error: %s", self.node_id, err.value)
 		else:
 			self.log.debug("Node: %s is not in fault state!", self.node_id)
