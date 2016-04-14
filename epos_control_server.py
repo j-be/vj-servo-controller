@@ -46,6 +46,11 @@ def on_move_to(position):
 	target_position = position
 
 
+@socketio.on('stop', namespace='/servo')
+def on_stop():
+	stop()
+
+
 def truncate_position(input_position):
 	try:
 		ret = int(input_position)
@@ -66,6 +71,7 @@ def move_to(target_position):
 	else:
 		logging.info("You asked me to move to %s, but position is %s, is_end: %s",
 					 position, current_position, is_end)
+		stop()
 
 
 def move_to_low():
@@ -76,6 +82,11 @@ def move_to_low():
 def move_to_high():
 	logging.debug("Moving to higher")
 	epos.moveToPositionWithVelocity(EPOS_RELATIVE_POSITION, EPOS_VELOCITY)
+
+
+def stop():
+	logging.info("Stopping")
+	epos.stop()
 
 
 def init_epos():

@@ -10,3 +10,7 @@
         console.log('value: ' + $('#position').val());
         socket.emit('moveTo', $('#position').val());
     }
+function sendStop() {
+    console.log('sendStop');
+    socket.emit('stop');
+}

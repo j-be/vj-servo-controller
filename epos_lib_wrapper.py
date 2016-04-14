@@ -111,6 +111,9 @@ class EposLibWrapper(object):
 		self.lib.VCS_WaitForTargetReached(self.dev_handle, self.node_id, timeout, byref(err))
 		self.log.info("Target reached on node: %s", self.node_id)
 
+	def stop(self):
+		self.moveToPositionWithVelocity(0, 0)
+
 	def isFaultState(self):
 		err = c_uint()
 		is_fault_state = c_int()
