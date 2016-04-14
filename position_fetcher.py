@@ -39,7 +39,7 @@ class PositionFetcher(object):
 
     def fetch_data(self):
         while self.serial_port:
-            msg = self.serial_port.read()
+            msg = self.serial_port.readline().strip()
             if msg:
                 self.log.debug("Received: %s", msg)
                 self.store_data(msg)
