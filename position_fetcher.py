@@ -12,6 +12,7 @@ MSG_TRUE = '1'
 
 class PositionFetcher(object):
     def __init__(self):
+        self.log = logging.getLogger("positionFetcher")
         self.serial_port = None
         self.fetcher_thread = None
         self.current_position = None
@@ -29,19 +30,20 @@ class PositionFetcher(object):
             self.serial_lock = threading.Lock()
         except OSError, error:
             self.serial_port = None
-            logging.error("Cannot initialize. Reason: %s", error)
+            self.log.error("Cannot initialize. Reason: %s", error)
         except serial.serialutil.SerialException, error:
             self.serial_port = None
-            logging.error("Cannot initialize. Reason: %s", error)
+            self.log.error("Cannot initialize. Reason: %s", error)
 
-        logging.debug("Serial: %s", self.serial_port)
+        self.log.debug("Serial: %s", self.serial_port)
 
     def fetch_data(self):
         while self.serial_port:
             msg = self.serial_port.read()
             if msg:
-                logging.debug("Received: %s", msg)
+                self.log.debug("Received: %s", msg)
                 self.store_data(msg)
+        self.log.error("Position fetcher stopped")
 
     def store_data(self, msg):
         if self.msg_pattern.match(msg):
@@ -49,14 +51,14 @@ class PositionFetcher(object):
             self.current_position = int(data[0])
             self.is_end = data[1] == MSG_TRUE
         else:
-            logging.error("Cannot store data for message: %s! Not matching the pattern.", msg)
+            self.log.info("Cannot store data for message: %s! Not matching the pattern.", msg)
 
     def start(self):
         self.fetcher_thread.start()
 
     def stop(self):
         # Close serial port
-        logging.info("Close serial port")
+        self.log.info("Close serial port")
         if self.serial_port is not None and self.serial_port.isOpen():
             self.serial_port.close()
             self.serial_port = None
