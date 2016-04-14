@@ -5,7 +5,9 @@ from flask import Flask, send_from_directory, jsonify, request
 from flask.ext.socketio import SocketIO, emit
 
 from epos_lib_wrapper import EposLibWrapper
-from position_fetcher import PositionFetcher, PositionMinReached, PositionMaxReached
+from position_fetcher import PositionFetcher
+
+POSITION_MAX_DELTA_TO_END = 0
 
 EPOS_RELATIVE_POSITION_HIGH = 20000000
 EPOS_RELATIVE_POSITION_LOW = -EPOS_RELATIVE_POSITION_HIGH
@@ -38,14 +40,14 @@ def on_move_to(position):
 
 
 def move_to(position):
-	current_position, is_min, is_max = position_fetch.get_current_position()
-	if position < current_position and not is_min:
+	current_position, is_end = position_fetch.get_current_position()
+	if position < current_position and not (is_end and abs(position - current_position) < POSITION_MAX_DELTA_TO_END):
 		move_to_low()
-	elif position > current_position and not is_max:
+	elif position > current_position and not (is_end and abs(position - current_position) < POSITION_MAX_DELTA_TO_END):
 		move_to_high()
 	else:
-		logging.info("You asked me to move to %s, but position is %s, is_min: %s, is_max: %s",
-					 position, current_position, is_min, is_max)
+		logging.info("You asked me to move to %s, but position is %s, is_end: %s",
+					 position, current_position, is_end)
 
 
 def move_to_low():
@@ -87,13 +89,9 @@ def main():
 		init_position_fetcher()
 		init_epos()
 
-		try:
-			# Blocking! - Start Flask server
-			socketio.run(app, host='0.0.0.0')
-		except PositionMinReached:
-			logging.warn('Min reached')
-		except PositionMaxReached:
-			logging.warn('Max reached')
+
+		# Blocking! - Start Flask server
+		socketio.run(app, host='0.0.0.0')
 	except KeyboardInterrupt:
 		pass
 	finally:

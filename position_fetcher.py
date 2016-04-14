@@ -6,22 +6,16 @@ import threading
 # Serial communication with Arduino
 SERIAL_NAME = '/dev/ttyUSB0'
 # Regex for a message
-REGEX_MSG = '^#[0-9]+ [0-9] [0-9]$'
+REGEX_MSG = '^#[0-9]+ [0-9]$'
 MSG_TRUE = '1'
 
-class PositionMinReached(Exception):
-    pass
-
-class PositionMaxReached(Exception):
-    pass
 
 class PositionFetcher(object):
     def __init__(self):
         self.serial_port = None
         self.fetcher_thread = None
         self.current_position = None
-        self.is_min = None
-        self.is_max = None
+        self.is_end = None
         self.msg_pattern = re.compile(REGEX_MSG)
 
         try:
@@ -53,13 +47,7 @@ class PositionFetcher(object):
         if self.msg_pattern.match(msg):
             data = msg.lstrip('#').split(" ")
             self.current_position = int(data[0])
-            cur_is_min = data[1] == MSG_TRUE
-            cur_is_max = data[2] == MSG_TRUE
-
-            if not self.is_min and cur_is_min:
-                raise PositionMinReached()
-            if not self.is_max and cur_is_max:
-                raise PositionMaxReached()
+            self.is_end = data[1] == MSG_TRUE
         else:
             logging.error("Cannot store data for message: %s! Not matching the pattern.", msg)
 
@@ -74,4 +62,4 @@ class PositionFetcher(object):
             self.serial_port = None
 
     def get_current_position(self):
-        return self.current_position, self.is_min, self.is_max
+        return self.current_position, self.is_end
