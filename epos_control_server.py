@@ -1,8 +1,8 @@
 import logging.config
 import signal
 
-from flask import Flask, send_from_directory, jsonify, request
-from flask.ext.socketio import SocketIO, emit
+from flask import Flask, send_from_directory
+from flask.ext.socketio import SocketIO
 
 from epos_lib_wrapper import EposLibWrapper
 from position_fetcher import PositionFetcher
