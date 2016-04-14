@@ -42,7 +42,7 @@ def static_js_proxy(path):
 @socketio.on('moveTo', namespace='/servo')
 def on_move_to(position):
 	global target_position
-	logging.error("Got move to %s", position)
+	logging.debug("Got move to %s", position)
 	target_position = position
 
 
@@ -64,6 +64,7 @@ def truncate_position(input_position):
 def move_to(target_position):
 	position = truncate_position(target_position)
 	current_position, is_end = position_fetch.get_current_position()
+	logging.info("Move to position %s, current is %s", position, current_position)
 	if position < current_position and not (is_end and abs(position - current_position) < POSITION_MAX_DELTA_TO_END):
 		move_to_low()
 	elif position > current_position and not (is_end and abs(position - current_position) < POSITION_MAX_DELTA_TO_END):
@@ -136,6 +137,7 @@ def main():
 		if position_fetch:
 			position_fetch.stop()
 		watch_position = False
+		logging.error("Cleanup done, exiting")
 
 if __name__ == '__main__':
 	main()
