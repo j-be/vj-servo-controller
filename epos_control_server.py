@@ -40,8 +40,18 @@ def on_move_to(position):
 	move_to(position)
 
 
+def truncate_position(input_position):
+	try:
+		ret = int(input_position)
+		ret = min(ret, 1023)
+		ret = max(ret, 0)
+		return ret
+	except Exception:
+		return 512
+
+
 def move_to(target_position):
-	position = int(target_position)
+	position = truncate_position(target_position)
 	current_position, is_end = position_fetch.get_current_position()
 	if position < current_position and not (is_end and abs(position - current_position) < POSITION_MAX_DELTA_TO_END):
 		move_to_low()
