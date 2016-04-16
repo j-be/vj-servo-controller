@@ -15,6 +15,10 @@ POSITION_MAX_DELTA_TO_END = 0
 EPOS_RELATIVE_POSITION = 20000000
 EPOS_VELOCITY = 4840
 
+MOVE_STOPPED = 0
+MOVE_TO_HIGH = 1
+MOVE_TO_LOW = 2
+
 # Instanciate Flask (Static files and REST API)
 app = Flask(__name__)
 # Instanciate SocketIO (Websockets, used for events) on top of it
@@ -27,6 +31,8 @@ position_fetch = None
 watch_position = True
 # Target position
 target_position = 512
+# Move direction
+move = MOVE_STOPPED
 
 
 @app.route('/')
@@ -76,18 +82,26 @@ def move_to(target_position):
 
 
 def move_to_low():
-	logging.debug("Moving to lower")
-	epos.moveToPositionWithVelocity(-EPOS_RELATIVE_POSITION, EPOS_VELOCITY)
+	global move
+	if move != MOVE_TO_LOW:
+		logging.debug("Moving to lower")
+		epos.moveToPositionWithVelocity(-EPOS_RELATIVE_POSITION, EPOS_VELOCITY)
+	move = MOVE_TO_LOW
 
 
 def move_to_high():
-	logging.debug("Moving to higher")
-	epos.moveToPositionWithVelocity(EPOS_RELATIVE_POSITION, EPOS_VELOCITY)
+	global move
+	if move != MOVE_TO_HIGH:
+		logging.debug("Moving to higher")
+		epos.moveToPositionWithVelocity(EPOS_RELATIVE_POSITION, EPOS_VELOCITY)
+	move = MOVE_TO_HIGH
 
 
 def stop():
+	global move
 	logging.info("Stopping")
 	epos.stop()
+	move = MOVE_STOPPED
 
 
 def init_epos():
