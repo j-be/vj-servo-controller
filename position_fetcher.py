@@ -38,8 +38,12 @@ class PositionFetcher(object):
         self.log.debug("Serial: %s", self.serial_port)
 
     def fetch_data(self):
+        msg = ""
         while self.serial_port:
-            msg = self.serial_port.readline().strip()
+            self.serial_port.flushInput()
+            while self.serial_port.read() != '#':
+                pass
+            msg = "#" + self.serial_port.readline().strip()
             if msg:
                 self.log.debug("Received: %s", msg)
                 self.store_data(msg)
