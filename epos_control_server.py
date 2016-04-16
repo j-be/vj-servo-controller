@@ -152,6 +152,7 @@ def main():
 			position_fetch.stop()
 		watch_position = False
 		logging.error("Cleanup done, exiting")
+		stop()
 
 if __name__ == '__main__':
 	main()
