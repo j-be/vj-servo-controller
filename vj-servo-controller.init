@@ -1,0 +1,63 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          vj-servo-controller
+# Required-Start:    $network
+# Required-Stop:
+# Default-Start:     3 5
+# Default-Stop:      0 1 2 6
+# Short-Description: Epos2 Servo Control Server
+# Description:       The Epos2 Servo Control Server provides a SocketIO server
+#                    allowing to interface with Maxon Epos2 Servo controller.
+### END INIT INFO
+
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+WORK_DIR="/opt/vj-servo-controller/"
+DAEMON=./epos_control_server.py
+NAME=vj-servo-controller
+DESC="Epos2 Servo Control Server"
+PID=/var/run/epos_control_server.pid
+
+
+case "$1" in
+    start)
+        echo -n "Starting $DESC: "
+        if [ -f $PID ]; then
+            echo "Already running!"
+            exit 1
+        fi
+        cd "$WORK_DIR"
+        ./epos_control_server.py > /dev/null 2>&1 &
+        pidof -x epos_control_server.py > $PID
+        if [ $? -eq 0 ]; then
+            echo "Done."
+        else
+            echo "Cannot start!"
+            exit 1
+        fi
+        ;;
+    stop)
+        echo -n "Stopping $DESC: "
+        if [ -f $PID ]; then
+            kill `cat $PID`
+            rm $PID
+            echo "Done."
+        else
+            echo "Not running."
+            exit 1
+        fi
+        ;;
+    restart)
+        ## Stop the service and regardless of whether it was
+        ## running or not, start it again.
+        $0 stop
+        sleep 1
+        $0 start
+        ;;
+    *)
+        N=/etc/init.d/$NAME
+        echo "Usage: $N {start|stop|restart}" >&2
+        exit 1
+        ;;
+esac
+
+exit 0
