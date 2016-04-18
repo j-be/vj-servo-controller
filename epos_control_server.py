@@ -68,6 +68,11 @@ def on_pull_to_right():
 	epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
 
 
+@socketio.on('resetByClutch', namespace='/servo')
+def on_reset_by_clutch():
+	pass
+
+
 def truncate_position(input_position):
 	try:
 		ret = int(input_position)

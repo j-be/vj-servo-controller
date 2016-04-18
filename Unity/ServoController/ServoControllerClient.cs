@@ -26,4 +26,8 @@ public class ServoControllerClient : AbstractSocketioClient {
 	public void PullToRight() {
 	    this.Emit("pullToRight");
 	}
+
+	public void ResetByClutch() {
+	    this.Emit("resetByClutch");
+	}
 }
