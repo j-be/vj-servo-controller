@@ -14,3 +14,11 @@ function sendStop() {
     console.log('sendStop');
     socket.emit('stop');
 }
+
+function pullToLeft() {
+    socket.emit('pullToLeft');
+}
+
+function pullToRight() {
+    socket.emit('pullToRight');
+}

@@ -13,6 +13,7 @@ from position_fetcher import PositionFetcher
 POSITION_MAX_DELTA_TO_END = 0
 
 EPOS_RELATIVE_POSITION = 20000000
+EPOS_SHORT_PULL_POSITION = 80000
 EPOS_VELOCITY = 4840
 
 MOVE_STOPPED = 0
@@ -55,6 +56,16 @@ def on_move_to(position):
 @socketio.on('stop', namespace='/servo')
 def on_stop():
 	stop()
+
+
+@socketio.on('pullToLeft', namespace='/servo')
+def on_pull_to_left():
+	epos.moveToPositionWithVelocity(EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
+
+
+@socketio.on('pullToRight', namespace='/servo')
+def on_pull_to_right():
+	epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
 
 
 def truncate_position(input_position):
@@ -141,7 +152,7 @@ def main():
 		init_epos()
 
 		watcher_thread = threading.Thread(target=position_watcher)
-		watcher_thread.start()
+		#watcher_thread.start()
 
 		# Blocking! - Start Flask server
 		socketio.run(app, host='0.0.0.0')

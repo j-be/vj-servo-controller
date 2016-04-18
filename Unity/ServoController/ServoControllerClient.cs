@@ -18,4 +18,12 @@ public class ServoControllerClient : AbstractSocketioClient {
 	public void EventStop() {
 		this.Emit("stop");
 	}
+
+	public void PullToLeft() {
+	    this.Emit("pullToLeft");
+	}
+
+	public void PullToRight() {
+	    this.Emit("pullToRight");
+	}
 }
