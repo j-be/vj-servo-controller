@@ -71,8 +71,8 @@ def on_pull_to_right():
 def truncate_position(input_position):
 	try:
 		ret = int(input_position)
-		ret = min(ret, 1023)
-		ret = max(ret, 0)
+		ret = min(ret, 1000)
+		ret = max(ret, 23)
 		return ret
 	except Exception:
 		return 512
