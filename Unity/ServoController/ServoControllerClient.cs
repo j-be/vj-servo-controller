@@ -2,11 +2,11 @@
 using SocketIOClient;
 
 public class ServoControllerClient : AbstractSocketioClient {
-	private static readonly string SOCKETIO_SERVER = "http://192.168.1.51:5000";
-	private static readonly string SOCKETIO_NAMESPACE = "/servo";
+	private static readonly string SERVO_SOCKETIO_SERVER = "http://192.168.1.51:5000";
+	private static readonly string SERVO_SOCKETIO_NAMESPACE = "/servo";
 
 	public ServoControllerClient()
-		: base(SOCKETIO_SERVER, SOCKETIO_NAMESPACE){}
+		: base(SERVO_SOCKETIO_SERVER, SERVO_SOCKETIO_NAMESPACE){}
 
 	/* -------------------- */
 	/* - Eventemitter     - */
