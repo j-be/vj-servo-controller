@@ -20,6 +20,8 @@ MOVE_STOPPED = 0
 MOVE_TO_HIGH = 1
 MOVE_TO_LOW = 2
 
+MOVE_DELTA_SHORT_PULL = 100
+
 # Instanciate Flask (Static files and REST API)
 app = Flask(__name__)
 # Instanciate SocketIO (Websockets, used for events) on top of it
@@ -60,13 +62,16 @@ def on_stop():
 
 @socketio.on('pullToLeft', namespace='/servo')
 def on_pull_to_left():
-	epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
+	#epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
+	global target_position
+	target_position -= MOVE_DELTA_SHORT_PULL
 
 
 @socketio.on('pullToRight', namespace='/servo')
 def on_pull_to_right():
 	epos.moveToPositionWithVelocity(EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
-
+	global target_position
+	target_position += MOVE_DELTA_SHORT_PULL
 
 def truncate_position(input_position):
 	try:
@@ -152,7 +157,7 @@ def main():
 		init_epos()
 
 		watcher_thread = threading.Thread(target=position_watcher)
-		#watcher_thread.start()
+		watcher_thread.start()
 
 		# Blocking! - Start Flask server
 		socketio.run(app, host='0.0.0.0')
