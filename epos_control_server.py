@@ -60,12 +60,12 @@ def on_stop():
 
 @socketio.on('pullToLeft', namespace='/servo')
 def on_pull_to_left():
-	epos.moveToPositionWithVelocity(EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
+	epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
 
 
 @socketio.on('pullToRight', namespace='/servo')
 def on_pull_to_right():
-	epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
+	epos.moveToPositionWithVelocity(EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
 
 
 def truncate_position(input_position):
