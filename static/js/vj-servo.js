@@ -22,3 +22,7 @@ function pullToLeft() {
 function pullToRight() {
     socket.emit('pullToRight');
 }
+
+function sendEnable() {
+    socket.emit('enable');
+}

@@ -62,9 +62,6 @@ class EposLibWrapper(object):
 			self.clearFaultState()
 
 		err = c_uint()
-		if not self.enabled:
-			self.enableDevice()
-
 		self.lib.VCS_ActivateProfileVelocityMode(self.dev_handle, self.node_id, byref(err))
 		self.log.debug("Activate ProfilePositionMode on node: %s error: %s", self.node_id, err.value)
 		if err.value == 0:
@@ -83,8 +80,6 @@ class EposLibWrapper(object):
 			self.clearFaultState()
 
 		err = c_uint()
-		if not self.enabled:
-			self.enableDevice()
 		self.lib.VCS_ActivateProfilePositionMode(self.dev_handle, self.node_id, byref(err))
 		self.log.debug("Activate PositionMode on node: %s error: %s", self.node_id, err.value)
 		if err.value == 0:
@@ -113,6 +108,7 @@ class EposLibWrapper(object):
 
 	def stop(self):
 		self.moveToPositionWithVelocity(0, 0)
+		self.disableDevice()
 
 	def isFaultState(self):
 		err = c_uint()

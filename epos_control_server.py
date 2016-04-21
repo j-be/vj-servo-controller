@@ -32,6 +32,8 @@ epos = None
 position_fetch = None
 # Watch position
 watch_position = True
+# Is servo enabled
+is_enabled = None
 # Target position
 target_position = 512
 # Move direction
@@ -46,6 +48,16 @@ def index():
 @app.route('/js/<path:path>')
 def static_js_proxy(path):
 	return send_from_directory('static/js/', path)
+
+
+@socketio.on('enable', namespace='/servo')
+def on_enable(dummy=None):
+	global is_enabled
+	global move
+
+	is_enabled = True
+	epos.enableDevice()
+	move = MOVE_STOPPED
 
 
 @socketio.on('moveTo', namespace='/servo')
@@ -84,17 +96,19 @@ def truncate_position(input_position):
 
 
 def move_to(target_position):
+	if not is_enabled:
+		return
 	position = truncate_position(target_position)
 	current_position, is_end = position_fetch.get_current_position()
 	logging.info("Move to position %s, current is %s", position, current_position)
-	if position < current_position and not (is_end and abs(position - current_position) < POSITION_MAX_DELTA_TO_END):
+	if position < current_position:
 		move_to_low()
-	elif position > current_position and not (is_end and abs(position - current_position) < POSITION_MAX_DELTA_TO_END):
+	elif position > current_position:
 		move_to_high()
 	else:
 		logging.info("You asked me to move to %s, but position is %s, is_end: %s",
 					 position, current_position, is_end)
-		stop()
+		epos.moveToPositionWithVelocity(0, 0)
 
 
 def move_to_low():
@@ -115,9 +129,12 @@ def move_to_high():
 
 def stop():
 	global move
+	global is_enabled
+
 	logging.info("Stopping")
 	epos.stop()
 	move = MOVE_STOPPED
+	is_enabled = False
 
 
 def init_epos():
@@ -158,6 +175,8 @@ def main():
 
 		watcher_thread = threading.Thread(target=position_watcher)
 		watcher_thread.start()
+
+		stop()
 
 		# Blocking! - Start Flask server
 		socketio.run(app, host='0.0.0.0')
