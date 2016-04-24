@@ -9,3 +9,6 @@
 
 # Other
 *.log
+
+# Unity stuff
+*.meta
