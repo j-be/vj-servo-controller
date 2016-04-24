@@ -12,11 +12,16 @@ public class ServoControllerClient : AbstractSocketioClient {
 	/* - Eventemitter     - */
 	/* -------------------- */
 	public void EventSetServoPosition(long position) {
+		Debug.LogWarning("Set servo to: " + position);
 		this.Emit("moveTo", position);
 	}
 
 	public void EventStop() {
 		this.Emit("stop");
+	}
+
+	public void EventEnable() {
+		this.Emit("enable");
 	}
 
 	public void PullToLeft() {
