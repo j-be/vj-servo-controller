@@ -4,7 +4,7 @@ import logging.config
 import signal
 import threading
 
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request
 from flask.ext.socketio import SocketIO
 
 from epos_lib_wrapper import EposLibWrapper
@@ -84,6 +84,22 @@ def on_pull_to_right():
 	epos.moveToPositionWithVelocity(EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
 	global target_position
 	target_position += MOVE_DELTA_SHORT_PULL
+
+
+@app.route('/enable/', methods=['POST'])
+def enable_post():
+	on_enable()
+
+
+@app.route('/moveTo/', methods=['POST'])
+def move_to_post():
+	on_move_to(request.form['position'])
+
+
+@app.route('/stop/', methods=['POST'])
+def stop_post():
+	on_stop()
+
 
 def truncate_position(input_position):
 	try:
