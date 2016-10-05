@@ -1,4 +1,5 @@
 import logging
+import logging.config
 import re
 import serial
 import threading
@@ -69,3 +70,13 @@ class PositionFetcher(object):
 
     def get_current_position(self):
         return self.current_position, self.is_end
+
+if __name__ == "__main__":
+    logging.config.fileConfig('log.ini')
+    tester = PositionFetcher()
+    tester.start()
+    try:
+        while True:
+            pass
+    finally:
+        tester.stop()
