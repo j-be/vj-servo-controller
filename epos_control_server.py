@@ -4,7 +4,7 @@ import logging.config
 import signal
 import threading
 
-from flask import Flask, send_from_directory, request
+from flask import Flask, send_from_directory, request, jsonify
 from flask.ext.socketio import SocketIO
 
 from epos_lib_wrapper import EposLibWrapper
@@ -91,16 +91,19 @@ def on_pull_to_right():
 @app.route('/enable/', methods=['POST'])
 def enable_post():
 	on_enable()
+	return jsonify({'error': 0}), 200
 
 
-@app.route('/moveTo/', methods=['POST'])
+@app.route('/moveto/', methods=['POST'])
 def move_to_post():
-	on_move_to(request.form['position'])
+	on_move_to(request.json['position'])
+	return jsonify({'error': 0}), 200
 
 
 @app.route('/stop/', methods=['POST'])
 def stop_post():
 	on_stop()
+	return jsonify({'error': 0}), 200
 
 
 def truncate_position(input_position):
