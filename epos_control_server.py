@@ -88,6 +88,12 @@ def on_pull_to_right():
 	target_position += MOVE_DELTA_SHORT_PULL
 
 
+@socketio.on('resetCenter', namespace='/servo')
+def resetCenter():
+	global POTI_OFFSET
+	POTI_OFFSET = 512 - position_fetch.get_current_position()[0]
+
+
 @app.route('/enable/', methods=['POST'])
 def enable_post():
 	on_enable()

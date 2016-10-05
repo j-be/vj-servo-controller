@@ -26,3 +26,7 @@ function pullToRight() {
 function sendEnable() {
     socket.emit('enable');
 }
+
+function resetCenter() {
+    socket.emit('resetCenter');
+}
