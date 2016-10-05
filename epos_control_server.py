@@ -22,6 +22,8 @@ MOVE_TO_LOW = 2
 
 MOVE_DELTA_SHORT_PULL = 100
 
+POTI_OFFSET = 0
+
 # Instanciate Flask (Static files and REST API)
 app = Flask(__name__)
 # Instanciate SocketIO (Websockets, used for events) on top of it
@@ -106,9 +108,9 @@ def truncate_position(input_position):
 		ret = int(input_position)
 		ret = min(ret, 723)
 		ret = max(ret, 300)
-		return ret
+		return ret - POTI_OFFSET
 	except Exception:
-		return 512
+		return 512 - POTI_OFFSET
 
 
 def move_to(target_position):
