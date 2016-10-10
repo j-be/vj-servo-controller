@@ -5,7 +5,7 @@ import signal
 import threading
 
 from flask import Flask, send_from_directory, request, jsonify
-from flask.ext.socketio import SocketIO
+from flask_socketio import SocketIO
 
 from epos_lib_wrapper import EposLibWrapper
 from position_fetcher import PositionFetcher
