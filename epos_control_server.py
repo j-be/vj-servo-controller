@@ -128,7 +128,7 @@ def move_to(target_position):
 		return
 	position = truncate_position(target_position)
 	current_position, is_end = position_fetch.get_current_position()
-	logging.info("Move to position %s, current is %s", position, current_position)
+	logging.debug("Move to position %s, current is %s", position, current_position)
 	if position < current_position:
 		move_to_low()
 	elif position > current_position:
