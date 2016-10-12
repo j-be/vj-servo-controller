@@ -77,7 +77,7 @@ def on_stop():
 
 @socketio.on('pullToLeft', namespace='/servo')
 def on_pull_to_left():
-	#epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
+	epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
 	global target_position
 	target_position -= MOVE_DELTA_SHORT_PULL
 
