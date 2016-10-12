@@ -25,6 +25,10 @@ class EposLibWrapper(object):
 		self.mode = None
 		self.dev_handle = None
 
+	def isEnabled(self):
+		self.log.info("Is Enabled: " + str(self.enabled))
+		return self.enabled
+
 	def _getLibraryName(self):
 		current_platform = platform.system()
 		self.log.debug("Running on platform: %s", current_platform);
@@ -55,7 +59,7 @@ class EposLibWrapper(object):
 		err = c_uint()
 		self.lib.VCS_SetDisableState(self.dev_handle, self.node_id, byref(err))
 		self.log.info("Disabling node: %s error: %s", self.node_id, err.value)
-		self.enabled = err.value == 0
+		self.enabled = err.value != 0
 
 	def activateProfilePositionMode(self):
 		if self.isFaultState():

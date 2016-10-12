@@ -57,10 +57,8 @@ def static_js_proxy(path):
 
 @socketio.on('enable', namespace='/servo')
 def on_enable(dummy=None):
-	global is_enabled
 	global move
 
-	is_enabled = True
 	epos.enableDevice()
 	move = MOVE_STOPPED
 
@@ -126,7 +124,7 @@ def truncate_position(input_position):
 
 
 def move_to(target_position):
-	if not is_enabled:
+	if not epos.isEnabled():
 		return
 	position = truncate_position(target_position)
 	current_position, is_end = position_fetch.get_current_position()
@@ -159,12 +157,10 @@ def move_to_high():
 
 def stop():
 	global move
-	global is_enabled
 
 	logging.info("Stopping")
 	epos.stop()
 	move = MOVE_STOPPED
-	is_enabled = False
 
 
 def position_watcher():
