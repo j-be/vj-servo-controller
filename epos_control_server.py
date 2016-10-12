@@ -24,14 +24,17 @@ MOVE_DELTA_SHORT_PULL = 100
 
 POTI_OFFSET = 0
 
+# Initialize logger
+logging.config.fileConfig('log.ini')
+
 # Instanciate Flask (Static files and REST API)
 app = Flask(__name__)
 # Instanciate SocketIO (Websockets, used for events) on top of it
 socketio = SocketIO(app)
 # EPOS2 control library
-epos = None
+epos = EposLibWrapper()
 # Position fetcher
-position_fetch = None
+position_fetch = PositionFetcher()
 # Watch position
 watch_position = True
 # Is servo enabled
@@ -164,19 +167,6 @@ def stop():
 	is_enabled = False
 
 
-def init_epos():
-	global epos
-	# Instanciate EPOS2 control library
-	epos = EposLibWrapper()
-	epos.openDevice()
-
-
-def init_position_fetcher():
-	global position_fetch
-	position_fetch = PositionFetcher()
-	position_fetch.start()
-
-
 def position_watcher():
 	while watch_position:
 		move_to(target_position)
@@ -189,16 +179,13 @@ def sig_term_handler(signum, frame):
 
 def main():
 	global watch_position
-	# Initialize logger
-	logging.config.fileConfig('log.ini')
-
 
 	try:
 		# Set signal handler for Shutdown
 		signal.signal(signal.SIGTERM, sig_term_handler)
 
-		init_position_fetcher()
-		init_epos()
+		position_fetch.start()
+		epos.openDevice()
 
 		watcher_thread = threading.Thread(target=position_watcher)
 		watcher_thread.start()
