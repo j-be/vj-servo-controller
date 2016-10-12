@@ -179,6 +179,7 @@ def sig_term_handler(signum, frame):
 
 def main():
 	global watch_position
+	watcher_thread = None
 
 	try:
 		# Set signal handler for Shutdown
@@ -200,6 +201,8 @@ def main():
 		if position_fetch:
 			position_fetch.stop()
 		watch_position = False
+		if watcher_thread:
+			watcher_thread.join()
 		logging.error("Cleanup done, exiting")
 		stop()
 
