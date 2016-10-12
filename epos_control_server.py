@@ -90,7 +90,7 @@ def on_pull_to_right():
 
 
 @socketio.on('resetCenter', namespace='/servo')
-def resetCenter():
+def reset_center():
 	global POTI_OFFSET
 	POTI_OFFSET = 512 - position_fetch.get_current_position()[0]
 
