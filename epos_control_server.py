@@ -45,6 +45,26 @@ target_position = 512
 move = MOVE_STOPPED
 
 
+def truncate_position(input_position):
+	try:
+		ret = int(input_position)
+		ret = min(ret, 723)
+		ret = max(ret, 300)
+		return ret - POTI_OFFSET
+	except Exception:
+		return 512 - POTI_OFFSET
+
+
+def set_target_position(position):
+	global target_position
+	target_position = truncate_position(position)
+
+
+def change_target_position(position_delta):
+	global target_position
+	target_position = truncate_position(target_position + position_delta)
+
+
 @app.route('/')
 def index():
 	return send_from_directory('static', 'index.html')
@@ -65,9 +85,8 @@ def on_enable(dummy=None):
 
 @socketio.on('moveTo', namespace='/servo')
 def on_move_to(position):
-	global target_position
 	logging.debug("Got move to %s", position)
-	target_position = position
+	set_target_position(position)
 
 
 @socketio.on('stop', namespace='/servo')
@@ -78,15 +97,13 @@ def on_stop():
 @socketio.on('pullToLeft', namespace='/servo')
 def on_pull_to_left():
 	epos.moveToPositionWithVelocity(-EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
-	global target_position
-	target_position -= MOVE_DELTA_SHORT_PULL
+	change_target_position(-MOVE_DELTA_SHORT_PULL)
 
 
 @socketio.on('pullToRight', namespace='/servo')
 def on_pull_to_right():
 	epos.moveToPositionWithVelocity(EPOS_SHORT_PULL_POSITION, EPOS_VELOCITY)
-	global target_position
-	target_position += MOVE_DELTA_SHORT_PULL
+	change_target_position(MOVE_DELTA_SHORT_PULL)
 
 
 @socketio.on('resetCenter', namespace='/servo')
@@ -113,20 +130,9 @@ def stop_post():
 	return jsonify({'error': 0}), 200
 
 
-def truncate_position(input_position):
-	try:
-		ret = int(input_position)
-		ret = min(ret, 723)
-		ret = max(ret, 300)
-		return ret - POTI_OFFSET
-	except Exception:
-		return 512 - POTI_OFFSET
-
-
-def move_to(target_position):
+def move_to(position):
 	if not epos.isEnabled():
 		return
-	position = truncate_position(target_position)
 	current_position, is_end = position_fetch.get_current_position()
 	logging.debug("Move to position %s, current is %s", position, current_position)
 	if position < current_position:
