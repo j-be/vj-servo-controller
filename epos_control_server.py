@@ -2,7 +2,7 @@
 
 import logging.config
 import signal
-import threading
+from threading import Thread
 
 from flask import Flask, send_from_directory, request, jsonify
 from flask_socketio import SocketIO
@@ -175,7 +175,7 @@ def sig_term_handler(signum, frame):
 
 def main():
 	global watch_position
-	watcher_thread = None
+	watcher = None
 
 	try:
 		# Set signal handler for Shutdown
@@ -184,8 +184,8 @@ def main():
 		position_fetch.start()
 		epos.openDevice()
 
-		watcher_thread = threading.Thread(target=position_watcher)
-		watcher_thread.start()
+		watcher = Thread(target=position_watcher)
+		watcher.start()
 
 		stop()
 
@@ -196,9 +196,9 @@ def main():
 	finally:
 		if position_fetch:
 			position_fetch.stop()
-		watch_position = False
-		if watcher_thread:
-			watcher_thread.join()
+		watch_position.value = False
+		if watcher:
+			watcher.join()
 		logging.error("Cleanup done, exiting")
 		stop()
 
