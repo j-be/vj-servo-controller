@@ -2,7 +2,7 @@
 
 import logging.config
 import signal
-from threading import Thread
+from multiprocessing import Process, Value
 
 from flask import Flask, send_from_directory, request, jsonify
 from flask_socketio import SocketIO
@@ -35,14 +35,15 @@ socketio = SocketIO(app)
 epos = EposLibWrapper()
 # Position fetcher
 position_fetch = PositionFetcher()
-# Watch position
-watch_position = True
 # Is servo enabled
 is_enabled = None
-# Target position
-target_position = 512
 # Move direction
 move = MOVE_STOPPED
+
+# Run condition for watcher process
+watch_position = Value('b', True)
+# Target position
+target_position = Value('i', 512)
 
 
 def truncate_position(input_position):
@@ -56,13 +57,13 @@ def truncate_position(input_position):
 
 
 def set_target_position(position):
-	global target_position
-	target_position = truncate_position(position)
+	with target_position.get_lock():
+		target_position.value = truncate_position(position)
 
 
 def change_target_position(position_delta):
-	global target_position
-	target_position = truncate_position(target_position + position_delta)
+	with target_position.get_lock():
+		target_position.value = truncate_position(int(target_position.value) + position_delta)
 
 
 @app.route('/')
@@ -169,9 +170,9 @@ def stop():
 	move = MOVE_STOPPED
 
 
-def position_watcher():
-	while watch_position:
-		move_to(target_position)
+def position_watcher(target_position, watch_position):
+	while watch_position.value:
+		move_to(target_position.value)
 	logging.error("Position watcher stopped")
 
 
@@ -190,7 +191,7 @@ def main():
 		position_fetch.start()
 		epos.openDevice()
 
-		watcher = Thread(target=position_watcher)
+		watcher = Process(target=position_watcher, args=(target_position, watch_position,))
 		watcher.start()
 
 		stop()
