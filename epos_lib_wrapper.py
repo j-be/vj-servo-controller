@@ -26,7 +26,6 @@ class EposLibWrapper(object):
 		self.dev_handle = None
 
 	def isEnabled(self):
-		self.log.info("Is Enabled: " + str(self.enabled))
 		return self.enabled
 
 	def _getLibraryName(self):
