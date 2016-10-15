@@ -4,7 +4,6 @@ import re
 from multiprocessing import Process, Queue
 from serial import Serial
 from serial.serialutil import SerialException
-from threading import Lock
 
 
 # Serial communication with Arduino
@@ -36,7 +35,6 @@ class PositionFetcher(Process):
         self.serial_port = None
         self.msg_pattern = re.compile(REGEX_MSG)
         self.position_queue = position_queue
-        self.serial_lock = Lock()
 
     def init_serial(self):
         try:
