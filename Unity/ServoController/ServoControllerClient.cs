@@ -1,8 +1,7 @@
 ﻿using UnityEngine;
-using SocketIOClient;
 
 public class ServoControllerClient : AbstractSocketioClient {
-	private static readonly string SOCKETIO_SERVER = "http://192.168.1.51:5000";
+	private static readonly string SOCKETIO_SERVER = "ws://192.168.1.51:5000";
 	private static readonly string SOCKETIO_NAMESPACE = "/servo";
 
 	public ServoControllerClient()
@@ -13,7 +12,7 @@ public class ServoControllerClient : AbstractSocketioClient {
 	/* -------------------- */
 	public void EventSetServoPosition(long position) {
 		Debug.LogWarning("Set servo to: " + position);
-		this.Emit("moveTo", position);
+		this.Emit("moveTo", new JSONObject(position));
 	}
 
 	public void EventStop() {

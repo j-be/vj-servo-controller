@@ -11,9 +11,4 @@ public class ServoTest : MonoBehaviour {
 		servoClient = new ServoControllerClient();
 		servoClient.EventSetServoPosition(position);
 	}
-
-	void OnDestroy() {
-		Debug.Log("[ServoTest] Closing sockets");
-		servoClient.Close();
-	}
 }
