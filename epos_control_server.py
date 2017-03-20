@@ -43,7 +43,7 @@ def on_move_to(position):
 
 
 @socketio.on('stop', namespace='/servo')
-def on_stop():
+def on_stop(_ = None):
 	watcher_command_queue.put(StopCommand())
 
 
