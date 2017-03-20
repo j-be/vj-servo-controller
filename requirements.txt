@@ -1,14 +1,14 @@
-## Custom recipes
-Flask-SocketIO==2.7.1
-python-socketio==1.6.0
-python-engineio==1.0.3
-recordclass==0.4.1
-gevent==1.1.2
-gevent-websocket==0.9.5
+# OpenEmbedded dependencies
+  flask
+  pyserial
 
-## OpenEmbedded recipes
-pyserial==3.1.1
-flask==0.11.1
-werkzeug==0.11.10
-six==1.10.0
-enum34==1.1.6
+# Custom dependecies
+  flask-socketio==2.8.5
+  python-engineio==1.2.4
+  gevent-websocket==0.9.5
+  gevent==1.2.1
+  recordclass==0.4.2
+  python-socketio==1.7.1
+
+# Dev only dependencies
+  fakeRPiGPIO
