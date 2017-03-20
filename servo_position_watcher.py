@@ -21,6 +21,7 @@ class CommandType(Enum):
     stop = 1
     move_to = 2
     reset_center = 3
+    status = 4
     shutdown = -1
 
 
@@ -70,12 +71,18 @@ class ResetCenterCommand(Command):
         super(ResetCenterCommand, self).__init__(CommandType.reset_center)
 
 
+class GetStatusCommand(Command):
+    def __init__(self):
+        super(GetStatusCommand, self).__init__(CommandType.status)
+
+
 class PositionWatcher(Process):
     def __init__(self, command_queue):
         super(PositionWatcher, self).__init__()
         self.log = logging.getLogger(PositionWatcher.__name__)
         # Queues for inbound and outbound
         self.command_queue = command_queue
+        self.status_queue = Queue(10)
         self.position_queue = None
         self.position_fetcher = None
         self.go_on = True
@@ -92,6 +99,9 @@ class PositionWatcher(Process):
 
     def get_command_queue(self):
         return self.command_queue
+
+    def get_status_queue(self):
+        return self.status_queue
 
     def _epos_enable(self, _ = None):
         self.epos.enableDevice()
@@ -182,10 +192,19 @@ class PositionWatcher(Process):
         except Empty:
             pass
 
+    def _get_status(self, _ = None):
+        self.status_queue.put({
+            'move_state': self.move,
+            'current_poti_position': self.current_position.get_position(),
+            'current_offset': self.offset,
+            'target_position': self.target_position
+        })
+
     def _get_command_handler(self):
         return {
             CommandType.enable: self._epos_enable,
             CommandType.move_to: self._epos_move_to,
             CommandType.reset_center: self._position_reset_center,
-            CommandType.stop: self._epos_stop
+            CommandType.stop: self._epos_stop,
+            CommandType.status: self._get_status
         }

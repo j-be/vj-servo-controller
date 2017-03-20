@@ -1,16 +1,19 @@
 console.log("Start");
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/servo');
+var updateTimer = null;
 
 socket.on('connect', function(msg) {
-    $('#operationSwitch').prop('disabled', false);
-    $('#targetPosition').prop('disabled', false);
-
     console.log('[INFO] Socket connected.');
+    if (!updateTimer)
+        updateTimer = setInterval(getStatus, 500);
 });
 
 socket.on('disconnect', function(msg) {
     $('#operationSwitch').prop('disabled', true);
     $('#targetPosition').prop('disabled', true);
+
+    clearInterval(updateTimer);
+    updateTimer = null;
 });
 
 function sendPosition() {
@@ -49,4 +52,33 @@ function handleOperationSwitch(cb) {
         sendEnable();
     else
         sendStop();
+}
+
+function getStatus() {
+    console.log("Fetching status")
+    $.ajax({
+        url: 'status',
+        accepts: 'json',
+        success: setStatus,
+        cache: false
+    });
+}
+
+function setStatus(data) {
+    console.log(data);
+
+    // Set mode
+    cb = $('#operationSwitch');
+    cb.prop('checked', data.move_state != 0);
+    cb.prop('disabled', false);
+
+    // Set target position
+    pos = $('#targetPosition');
+    pos.val(data.target_position);
+    pos.prop('disabled', false);
+
+    // Set current position
+    cur_pos = $('#currentPosition');
+    console.log("Setting val to " + data.current_poti_position + data.current_offset);
+    cur_pos.val(data.current_poti_position + data.current_offset);
 }
