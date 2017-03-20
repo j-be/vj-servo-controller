@@ -4,6 +4,7 @@ import re
 from multiprocessing import Process, Queue
 from serial import Serial
 from serial.serialutil import SerialException
+from mock_serial import MockSerial
 
 
 # Serial communication with Arduino
@@ -42,8 +43,8 @@ class PositionFetcher(Process):
             self.serial_port.flushInput()
             self.serial_port.flushOutput()
         except (OSError, SerialException) as error:
-            self.stop()
             self.log.error("Cannot initialize. Reason: %s", error)
+            self.serial_port = MockSerial()
 
         self.log.debug("Serial: %s", self.serial_port)
 
