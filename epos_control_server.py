@@ -25,9 +25,9 @@ def index():
 	return send_from_directory('static', 'index.html')
 
 
-@app.route('/js/<path:path>')
-def static_js_proxy(path):
-	return send_from_directory('static/js/', path)
+@app.route('/<path:path>')
+def static_proxy(path):
+	return send_from_directory('static/', path)
 
 
 @socketio.on('enable', namespace='/servo')
