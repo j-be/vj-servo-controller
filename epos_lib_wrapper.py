@@ -1,6 +1,7 @@
 import logging
 import platform
 from ctypes import cdll, c_int, c_uint, byref
+from mock_lib import MockLib
 
 MODE_POSITION = 1
 MODE_PROFILE_POSITION = 2
@@ -15,7 +16,11 @@ EPOS2_MAX_ACCEL = long(pow(2, 32) - 1)
 class EposLibWrapper(object):
 	def __init__(self, dev_name="EPOS2", protocol="MAXON SERIAL V2", interface="USB", port="USB0"):
 		self.log = logging.getLogger("eposLib")
-		self.lib = cdll.LoadLibrary(self._getLibraryName())
+		try :
+			self.lib = cdll.LoadLibrary(self._getLibraryName())
+		except OSError:
+			self.log.error("Cannot load " + self._getLibraryName() + ". Using Mock!")
+			self.lib = MockLib()
 		self.dev_name = dev_name
 		self.protocol = protocol
 		self.interface = interface
@@ -52,7 +57,7 @@ class EposLibWrapper(object):
 		err = c_uint()
 		self.lib.VCS_SetEnableState(self.dev_handle, self.node_id, byref(err))
 		self.log.debug("Enabling node: %s error: %s", self.node_id, err.value)
-		self.enabled = err.value == 0
+		self.enabled = True
 
 	def disableDevice(self):
 		err = c_uint()
