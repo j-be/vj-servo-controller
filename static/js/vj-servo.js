@@ -69,7 +69,7 @@ function setStatus(data) {
 
     // Set mode
     cb = $('#operationSwitch');
-    cb.prop('checked', data.move_state != 0);
+    cb.prop('checked', data.enabled);
     cb.prop('disabled', false);
 
     // Set target position

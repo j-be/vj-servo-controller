@@ -194,6 +194,7 @@ class PositionWatcher(Process):
 
     def _get_status(self, _ = None):
         self.status_queue.put({
+            'enabled': self.epos.isEnabled(),
             'move_state': self.move,
             'current_poti_position': self.current_position.get_position(),
             'current_offset': self.offset,
