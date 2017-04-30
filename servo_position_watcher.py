@@ -176,7 +176,7 @@ class PositionWatcher(Process):
             pass
 
     def _watch_position(self):
-        if not self.epos.isEnabled():
+        if not self.epos.isEnabled() or not self.current_position:
             return
 
         position = self.target_position - self.offset
@@ -195,13 +195,21 @@ class PositionWatcher(Process):
             pass
 
     def _get_status(self, _ = None):
-        self.status_queue.put({
-            'enabled': self.epos.isEnabled(),
+        current_status = {
+            'enabled': False,
             'move_state': self.move,
-            'current_poti_position': self.current_position.get_position(),
+            'current_poti_position': -1,
             'current_offset': self.offset,
             'target_position': self.target_position
-        })
+        }
+
+        if self.epos:
+            current_status['enabled'] = self.epos.isEnabled()
+
+        if self.current_position:
+            current_status['current_poti_position'] = self.current_position.get_position()
+
+        self.status_queue.put(current_status)
 
     def _get_command_handler(self):
         return {
