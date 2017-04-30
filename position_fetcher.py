@@ -94,11 +94,16 @@ class PositionFetcher(Process):
 
 
 if __name__ == "__main__":
+    from Queue import Empty
     logging.config.fileConfig('log.ini')
-    tester = PositionFetcher(Queue(10))
+    pos_que = Queue(10)
+    tester = PositionFetcher(pos_que)
     tester.start()
     try:
         while True:
-            pass
+            try:
+                print pos_que.get(False).get_position()
+            except Empty:
+                pass
     finally:
         tester.stop()
