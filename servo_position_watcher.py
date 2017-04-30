@@ -87,7 +87,7 @@ class PositionWatcher(Process):
         self.position_fetcher = None
         self.go_on = True
         # EPOS2 control library
-        self.epos = EposLibWrapper()
+        self.epos = None
         # Move direction
         self.move = MOVE_STOPPED
         # Command handlers
@@ -139,6 +139,8 @@ class PositionWatcher(Process):
 
     def run(self):
         self.log.info("Starting position watcher process")
+        self.epos = EposLibWrapper()
+        self.epos.openDevice()
         self.position_queue = Queue(10)
         self.position_fetcher = PositionFetcher(self.position_queue)
         self.position_fetcher.start()
