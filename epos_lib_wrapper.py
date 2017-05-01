@@ -30,7 +30,7 @@ class EposLibWrapper(object):
 
 	def _getLibraryName(self):
 		current_platform = platform.system()
-		self.log.debug("Running on platform: %s", current_platform);
+		self.log.debug("Running on platform: %s", current_platform)
 		for lib, platforms in LIBS.iteritems():
 			if current_platform in platforms:
 				self.log.info("Found lib: %s for platform: %s", lib, current_platform)
@@ -39,7 +39,7 @@ class EposLibWrapper(object):
 
 	def openDevice(self):
 		err = c_uint()
-		self.dev_handle = self.lib.VCS_OpenDevice(self.dev_name, self.protocol, self.interface, self.port, byref(err));
+		self.dev_handle = self.lib.VCS_OpenDevice(self.dev_name, self.protocol, self.interface, self.port, byref(err))
 		self.log.info("Open handle: %s error: %s", self.dev_handle, err.value)
 
 	def closeDevice(self):
