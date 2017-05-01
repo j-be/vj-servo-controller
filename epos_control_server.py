@@ -7,7 +7,7 @@ from multiprocessing import Queue
 from flask import Flask, send_from_directory, request, jsonify
 from flask_socketio import SocketIO
 
-from servo_position_watcher import EnableCommand, MoveToCommand, StopCommand, ResetCenterCommand, PositionWatcher
+from servo_position_watcher import EnableCommand, MoveToCommand, StopCommand, ResetCenterCommand, PositionWatcher, GetStatusCommand
 
 
 # Initialize logger
@@ -18,6 +18,8 @@ app = Flask(__name__)
 socketio = SocketIO(app)
 # Position command queue
 watcher_command_queue = None
+# Staus queue
+status_readout_queue = None
 
 
 @app.route('/')
@@ -25,10 +27,17 @@ def index():
 	return send_from_directory('static', 'index.html')
 
 
-@app.route('/js/<path:path>')
-def static_js_proxy(path):
-	return send_from_directory('static/js/', path)
+@app.route('/<path:path>')
+def static_proxy(path):
+	return send_from_directory('static/', path)
 
+
+@app.route('/status', methods=['GET'])
+def get_status():
+	watcher_command_queue.put(GetStatusCommand())
+	status = status_readout_queue.get()
+	logging.info("Got status=" + str(status))
+	return jsonify(status)
 
 @socketio.on('enable', namespace='/servo')
 def on_enable(_ = None):
@@ -76,6 +85,7 @@ def sig_term_handler(signum, _):
 
 def main():
 	global watcher_command_queue
+	global status_readout_queue
 	watcher = None
 
 	try:
@@ -84,6 +94,7 @@ def main():
 
 		watcher = PositionWatcher(Queue(10))
 		watcher_command_queue = watcher.get_command_queue()
+		status_readout_queue = watcher.get_status_queue()
 		watcher.start()
 
 		watcher_command_queue.put(StopCommand())
