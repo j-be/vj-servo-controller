@@ -1,4 +1,5 @@
 import logging
+import logging.config
 import platform
 from ctypes import cdll, c_int, c_uint, byref
 
@@ -130,6 +131,9 @@ class EposLibWrapper(object):
 
 if __name__ == "__main__":
 	from time import sleep
+
+	logging.config.fileConfig('log.ini')
+
 	wrapper = EposLibWrapper()
 
 	try:
