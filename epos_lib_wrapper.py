@@ -43,6 +43,38 @@ class EposLibWrapper(object):
 		self.dev_handle = self.lib.VCS_OpenDevice(self.dev_name, self.protocol, self.interface, self.port, byref(err))
 		self.log.info("Open handle: %s error: %s", self.dev_handle, err.value)
 
+	def getBaudRates(self):
+		err = c_uint()
+		baudrate_sel = c_int(123456)
+		end = c_int(1)
+		ret = []
+
+		self.lib.VCS_GetBaudrateSelection(self.dev_name, self.protocol, self.interface, self.port, 1,
+										  byref(baudrate_sel), byref(end), byref(err))
+		self.log.info("Got baudrate: %s, end: %s, error: %s", baudrate_sel.value, end.value, err.value)
+		ret.append(baudrate_sel.value)
+
+		while end.value != 1:
+			self.lib.VCS_GetBaudrateSelection(self.dev_name, self.protocol, self.interface, self.port, 0,
+											  byref(baudrate_sel), byref(end), byref(err))
+			self.log.info("Got baudrate: %s, end: %s, error: %s", baudrate_sel.value, end.value, err.value)
+			ret.append(baudrate_sel.value)
+
+		return ret
+
+	def getProtocolStackSettings(self):
+		err = c_uint()
+		baudrate = c_uint()
+		timeout = c_uint()
+		ret = self.lib.VCS_GetProtocolStackSettings(self.dev_handle, byref(baudrate), byref(timeout), byref(err))
+		self.log.info("Get Protocol Stack Settings: %s, baudrate: %s, timeout: %s, error: %s",
+					  ret, baudrate.value, timeout.value, err.value)
+
+	def setProtocolStackSettings(self, baudrate, timeout):
+		err = c_uint()
+		ret = self.lib.VCS_SetProtocolStackSettings(self.dev_handle, baudrate, timeout, byref(err))
+		self.log.info("Set Protocol Stack Settings: %s error: %s", ret, err.value)
+
 	def closeDevice(self):
 		self.disableDevice()
 		err = c_uint()
@@ -138,6 +170,8 @@ if __name__ == "__main__":
 
 	try:
 		wrapper.openDevice()
+		print "BaudRates: %s" % wrapper.getBaudRates()
+		wrapper.getProtocolStackSettings()
 		wrapper.setProfilePositionVelocity(3000, 1000)
 		wrapper.moveToPosition(0, True)
 		#sleep(MOVEMENT_TIME)
