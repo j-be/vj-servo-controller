@@ -59,7 +59,7 @@ class EposLibWrapper(object):
 		err = c_uint()
 		self.lib.VCS_SetDisableState(self.dev_handle, self.node_id, byref(err))
 		self.log.info("Disabling node: %s error: %s", self.node_id, err.value)
-		self.enabled = err.value != 0
+		self.enabled = self.enabled and err.value != 0
 
 	def activateProfilePositionMode(self):
 		if self.isFaultState():
