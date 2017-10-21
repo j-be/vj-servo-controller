@@ -3,12 +3,12 @@
   pyserial
 
 # Custom dependecies
-  flask-socketio==2.8.5
-  python-engineio==1.2.4
-  gevent-websocket==0.9.5
-  gevent==1.2.1
-  recordclass==0.4.2
-  python-socketio==1.7.1
+  python-engineio==1.7.0
+  flask-socketio==2.9.2
+  gevent==1.2.2
+  gevent-websocket==0.10.1
+  recordclass==0.4.3
+  python-socketio==1.8.1
 
 # Dev only dependencies
   fakeRPiGPIO
