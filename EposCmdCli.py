@@ -2,6 +2,7 @@
 
 from optparse import OptionParser
 from epos_lib_wrapper import EposLibWrapper as Epos
+from epos_lib_wrapper import EPOS2_MAX_ACCEL
 
 def parse_cmd_args():
     parser = OptionParser()
@@ -17,13 +18,13 @@ def parse_cmd_args():
                       help="amount to move")
     parser.add_option("-v", "--velocity", dest="velocity", type="int",
                       help="the velocity to move with")
-    parser.add_option("-a", "--acceleration", dest="acceleration", type="long", default=long(pow(2, 32) -1),
+    parser.add_option("-a", "--acceleration", dest="acceleration", type="long", default=EPOS2_MAX_ACCEL,
                       help="acceleration/deceleration")
     (options, _) = parser.parse_args()
     return options
 
 args = parse_cmd_args()
-print args
+print(args)
 
 epos = Epos(args.dev_name, args.protocol, args.interface, args.port)
 epos.openDevice()

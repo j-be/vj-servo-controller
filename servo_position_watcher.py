@@ -155,7 +155,7 @@ class PositionWatcher(Process):
                 self.log.debug("Watched position")
         except KeyboardInterrupt:
             self.go_on = False
-        except Exception, e:
+        except Exception as e:
             self.log.error("Exception in run: " + str(e))
         finally:
             self.position_fetcher.stop()

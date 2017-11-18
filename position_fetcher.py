@@ -102,7 +102,7 @@ if __name__ == "__main__":
     try:
         while True:
             try:
-                print pos_que.get(False).get_position()
+                print(pos_que.get(False).get_position())
             except Empty:
                 pass
     finally:
