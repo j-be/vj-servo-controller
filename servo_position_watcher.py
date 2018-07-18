@@ -1,6 +1,6 @@
 import logging
 from enum import Enum
-from Queue import Empty
+from queue import Empty
 from multiprocessing import Process, Queue
 
 from epos_lib_wrapper import EposLibWrapper
@@ -13,7 +13,7 @@ MOVE_TO_LOW = 2
 EPOS_RELATIVE_POSITION = 20000000
 EPOS_SHORT_PULL_POSITION = 80000
 EPOS_VELOCITY = 4840
-EPOS_ACCELERATION = long(pow(2, 32) - 1)
+EPOS_ACCELERATION = int(pow(2, 32) - 1)
 
 
 class CommandType(Enum):

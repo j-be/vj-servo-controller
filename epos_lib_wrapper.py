@@ -11,7 +11,7 @@ LIBS = {
 	"EposCmd.dll": ["Windows", "CYGWIN_NT-10.0"]
 	}
 
-EPOS2_MAX_ACCEL = long(pow(2, 32) - 1)
+EPOS2_MAX_ACCEL = int(pow(2, 32) - 1)
 
 class EposLibWrapper(object):
 	def __init__(self, dev_name="EPOS2", protocol="MAXON SERIAL V2", interface="USB", port="USB0"):
@@ -32,7 +32,7 @@ class EposLibWrapper(object):
 	def _getLibraryName(self):
 		current_platform = platform.system()
 		self.log.debug("Running on platform: %s", current_platform)
-		for lib, platforms in LIBS.iteritems():
+		for lib, platforms in LIBS.items():
 			if current_platform in platforms:
 				self.log.info("Found lib: %s for platform: %s", lib, current_platform)
 				return lib
