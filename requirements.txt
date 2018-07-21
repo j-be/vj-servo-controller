@@ -1,14 +1,15 @@
 # OpenEmbedded dependencies
   flask
   pyserial
+  gevent
+  future
 
 # Custom dependecies
-  python-engineio==1.7.0
-  flask-socketio==2.9.2
-  gevent==1.2.2
+  python-engineio==2.2.0
+  flask-socketio==3.0.1
   gevent-websocket==0.10.1
   recordclass==0.4.3
-  python-socketio==1.8.1
+  python-socketio==2.0.0
 
 # Dev only dependencies
   fakeRPiGPIO
