@@ -130,7 +130,10 @@ class PositionWatcher(Process):
         self.move = MOVE_STOPPED
 
     def _position_reset_center(self, _):
-        self.offset = 512 - self.current_position.get_position()
+        if self.current_position:
+            self.offset = 512 - self.current_position.get_position()
+        else:
+            self.log.error("Cannot reset center, current position unknown!")
 
     def _epos_stop(self, _ = None):
         self.log.info("Stopping")
