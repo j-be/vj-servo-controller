@@ -1,5 +1,6 @@
 console.log("Start");
 var socket = io.connect('http://' + document.domain + ':' + location.port + '/servo');
+var configSocket = io.connect('http://' + document.domain + ':' + location.port + '/config');
 var updateTimer = null;
 
 socket.on('connect', function(msg) {
@@ -40,7 +41,7 @@ function sendEnable() {
 }
 
 function resetCenter() {
-    socket.emit('resetCenter');
+    configSocket.emit('resetCenter');
 }
 
 function toCenter() {

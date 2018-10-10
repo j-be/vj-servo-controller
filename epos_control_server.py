@@ -56,8 +56,9 @@ def on_stop(_ = None):
 	watcher_command_queue.put(StopCommand())
 
 
-@socketio.on('resetCenter', namespace='/servo')
+@socketio.on('resetCenter', namespace='/config')
 def reset_center():
+	logging.error("Resetting center")
 	watcher_command_queue.put(ResetCenterCommand())
 
 
